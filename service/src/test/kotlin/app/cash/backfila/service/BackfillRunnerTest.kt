@@ -254,26 +254,37 @@ class BackfillRunnerTest {
          * as a run batch request, two will get buffered, and one will be stuck waiting on the
          * channel
          */
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         assertThat(
             fakeBackfilaClientServiceClient.getNextBatchRangeRequests.receive().previous_end_key).isNull()
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         fakeBackfilaClientServiceClient.getNextBatchRangeResponses.send(Result.success(
             nextBatchResponse(start = "0", end = "99", scannedCount = 100, matchingCount = 100)))
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
 
         assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeRequests.receive()
             .previous_end_key).isEqualTo("99".encodeUtf8())
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         fakeBackfilaClientServiceClient.getNextBatchRangeResponses.send(Result.success(
             nextBatchResponse(start = "100", end = "199", scannedCount = 100, matchingCount = 100)))
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeRequests.receive()
             .previous_end_key).isEqualTo("199".encodeUtf8())
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         fakeBackfilaClientServiceClient.getNextBatchRangeResponses.send(Result.success(
             nextBatchResponse(start = "200", end = "299", scannedCount = 100, matchingCount = 100)))
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeRequests.receive()
             .previous_end_key).isEqualTo("299".encodeUtf8())
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         fakeBackfilaClientServiceClient.getNextBatchRangeResponses.send(Result.success(
             nextBatchResponse(start = "300", end = "399", scannedCount = 100, matchingCount = 100)))
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         // Not buffering any more batches
         waitForOtherCoroutines()
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
         assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeRequests.poll()).isNull()
+        assertThat(fakeBackfilaClientServiceClient.getNextBatchRangeResponses.poll()).isNull()
 
         assertThat(fakeBackfilaClientServiceClient.runBatchRequests.receive()).isNotNull()
         fakeBackfilaClientServiceClient.runBatchResponses.send(
